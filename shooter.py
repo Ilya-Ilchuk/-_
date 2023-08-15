@@ -25,11 +25,14 @@ ball_x, ball_y = 0, 0
 ball_was_fired = False
 
 ALIEN_STEP = 0.1
+alien_speed = ALIEN_STEP
 alien_image = pygame.image.load('images/alien.png')
 alien_width, alien_height = alien_image.get_size()
 alien_x, alien_y = random.randint(0, screen_width - alien_width), 0
 
 game_is_running = True
+
+game_score = 0
 
 while game_is_running:
     for event in pygame.event.get():
@@ -51,7 +54,7 @@ while game_is_running:
             if event.key == pygame.K_RIGHT:
                 fighter_is_moving_right = False
 
-    alien_y += ALIEN_STEP
+    alien_y += alien_speed
 
     if fighter_is_moving_left and fighter_x >= FIGHTER_STEP:
         fighter_x -= FIGHTER_STEP
@@ -69,10 +72,20 @@ while game_is_running:
     screen.blit(alien_image, (alien_x, alien_y))
     if ball_was_fired:
         screen.blit(ball_image, (ball_x, ball_y))  # Display the ball image
+
+    game_score_text = game_font.render(f"Your score is: {game_score}", True, "white")
+    screen.blit(game_score_text, (20, 20))
+
     pygame.display.update()
 
     if alien_y + alien_height > fighter_y:
         game_is_running = False
+
+    if ball_was_fired and alien_x < ball_x < alien_x + alien_width - ball_width and alien_y < ball_y < alien_y + alien_height - ball_height:
+        ball_was_fired = False
+        alien_x, alien_y = random.randint(0, screen_width - alien_width), 0
+        alien_speed += ALIEN_STEP / 2
+        game_score += 1
 
 game_over_text = game_font.render("Game Over", True, 'white')
 game_over_rectangle = game_over_text.get_rect()
@@ -80,5 +93,4 @@ game_over_rectangle.center = (screen_width / 2, screen_height / 2)
 screen.blit(game_over_text, game_over_rectangle)
 pygame.display.update()
 pygame.time.wait(5000)
-
 pygame.quit()
